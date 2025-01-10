@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes heroEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.content-section {
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-section.animate-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.perspective-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: black;
+  color: white;
+}
+
+/* Custom gradient background */
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+}
