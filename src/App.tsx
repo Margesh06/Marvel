@@ -26,7 +26,7 @@ const heroes = [
   },
   {
     name: "Captain America",
-    modelImage: "https://wallpapers.com/images/hd/spider-man-and-iron-man-qsceazkj7tw1c1jt.jpg",
+    modelImage: "https://lh4.googleusercontent.com/proxy/S-5UsR2Q3j40IthXM7eEOF4L8tdps-NT_-ULiuE2zWGGT3Zb8DEHh7QigXox3KwOtQLDFq_oz5-bS9MZGJupxrzJxNFSDH8QscMqs6PyKIH9pJ6WTbg7mgMp_EKJ2i4sEmxT1qm-ms_Dra4pVCMhht4TBNgRXngFbQ",
     title: "Steve Rogers",
     description: "First Avenger",
     stats: {
@@ -41,8 +41,11 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [showFightSequence, setShowFightSequence] = useState(false);
+  const [battleState, setBattleState] = useState<'start' | 'fight' | 'end'>('start');
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,7 +60,6 @@ function App() {
         const translateZ = Math.sin(scrollPercent * Math.PI) * 200;
         const scale = 1 + (scrollPercent * 0.2);
         
-        // Calculate which hero to show based on scroll position
         const newIndex = Math.floor(scrollPercent * 3) % heroes.length;
         if (newIndex !== currentHeroIndex) {
           setCurrentHeroIndex(newIndex);
@@ -90,7 +92,25 @@ function App() {
     };
   }, [currentHeroIndex]);
 
+  useEffect(() => {
+    if (showFightSequence) {
+      setBattleState('start');
+      const timer = setTimeout(() => {
+        setBattleState('fight');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showFightSequence]);
+
+  const handleInitiateSequence = () => {
+    setShowFightSequence(true);
+    if (fightRef.current) {
+      fightRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const hero = heroes[currentHeroIndex];
+  const nextHero = heroes[(currentHeroIndex + 1) % heroes.length];
 
   return (
     <div className="min-h-[400vh] bg-black relative">
@@ -295,11 +315,155 @@ function App() {
               The world needs heroes. With cutting-edge technology and unwavering determination,
               we stand ready to face any threat. Are you ready to make a difference?
             </p>
-            <button className="px-12 py-6 bg-gradient-to-r from-red-500 to-yellow-500 rounded-full text-white font-bold text-xl transform hover:scale-105 transition-all relative group">
-              <span className="relative z-10">Initiate Sequence</span>
+            <button 
+              onClick={handleInitiateSequence}
+              className="px-12 py-6 bg-gradient-to-r from-red-500 to-yellow-500 rounded-full text-white font-bold text-xl transform hover:scale-105 transition-all relative group"
+            >
+              <span className="relative z-10">Initiate Battle</span>
               <div className="absolute inset-0 bg-white/20 rounded-full filter blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
             </button>
           </div>
+        </div>
+
+        {/* Fight Sequence Section */}
+        <div 
+          ref={fightRef}
+          className={`fixed inset-0 z-50 transition-all duration-1000 ${
+            showFightSequence ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="absolute inset-0 bg-black/90" />
+          
+          {/* Battle Arena */}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Energy Field */}
+            <div className="absolute inset-0">
+              <div className="absolute w-full h-full bg-gradient-to-r from-red-500/20 to-blue-500/20 animate-pulse" />
+              <div className="absolute w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-500/30 via-transparent to-transparent animate-pulse" />
+            </div>
+
+            {/* Energy Beams */}
+            <div className="absolute inset-0">
+              <div className="absolute w-full h-2 bg-blue-500/50 animate-beam-horizontal" />
+              <div className="absolute h-full w-2 bg-red-500/50 animate-beam-vertical" />
+              <div className="absolute w-[200%] h-[200%] -left-1/2 -top-1/2 animate-spin-slow">
+                <div className="w-full h-2 bg-yellow-500/30 absolute top-1/2 -translate-y-1/2 transform rotate-45" />
+                <div className="w-full h-2 bg-yellow-500/30 absolute top-1/2 -translate-y-1/2 transform -rotate-45" />
+              </div>
+            </div>
+
+            {/* Battle Particles */}
+            <div className="absolute inset-0">
+              {Array.from({ length: 20 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-2 h-2 bg-yellow-500 rounded-full animate-float"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 2}s`,
+                    animationDuration: `${2 + Math.random() * 3}s`
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Fighting Heroes */}
+          <div className="relative z-10 w-full h-full flex items-center justify-center">
+            <div className={`transition-all duration-1000 flex items-center justify-between w-full px-20 ${
+              battleState === 'start' ? 'translate-x-0' : 
+              battleState === 'fight' ? 'scale-110' : ''
+            }`}>
+              {/* Hero 1 */}
+              <div className={`transition-all duration-1000 ${
+                battleState === 'start' ? 'translate-x-0' :
+                battleState === 'fight' ? '-translate-x-20 scale-110' : ''
+              }`}>
+                <img
+                  src={hero.modelImage}
+                  alt={hero.name}
+                  className="w-96 h-96 object-contain filter drop-shadow-[0_0_15px_rgba(255,0,0,0.5)] animate-hero-float"
+                />
+                <div className="absolute -inset-4 bg-gradient-to-r from-red-500/30 to-transparent animate-pulse rounded-full filter blur-xl" />
+              </div>
+
+              {/* VS Text */}
+              <div className={`text-8xl font-bold text-white transition-all duration-1000 ${
+                battleState === 'start' ? 'opacity-100 scale-100' :
+                battleState === 'fight' ? 'opacity-0 scale-150' : ''
+              }`}>
+                VS
+              </div>
+
+              {/* Hero 2 */}
+              <div className={`transition-all duration-1000 ${
+                battleState === 'start' ? 'translate-x-0' :
+                battleState === 'fight' ? 'translate-x-20 scale-110' : ''
+              }`}>
+                <img
+                  src={nextHero.modelImage}
+                  alt={nextHero.name}
+                  className="w-96 h-96 object-contain filter drop-shadow-[0_0_15px_rgba(0,0,255,0.5)] animate-hero-float-reverse"
+                />
+                <div className="absolute -inset-4 bg-gradient-to-l from-blue-500/30 to-transparent animate-pulse rounded-full filter blur-xl" />
+              </div>
+            </div>
+          </div>
+
+          {/* HUD Overlay */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-0 w-64 h-64 border-l-2 border-t-2 border-red-500/50 animate-scan" />
+            <div className="absolute top-0 right-0 w-64 h-64 border-r-2 border-t-2 border-blue-500/50 animate-scan" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 border-l-2 border-b-2 border-yellow-500/50 animate-scan" />
+            <div className="absolute bottom-0 right-0 w-64 h-64 border-r-2 border-b-2 border-green-500/50 animate-scan" />
+          </div>
+
+          {/* Battle Stats */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl">
+            <div className="grid grid-cols-2 gap-8">
+              <div className="bg-black/50 backdrop-blur-md rounded-xl p-4">
+                <h3 className="text-red-500 text-xl mb-2">{hero.name}</h3>
+                <div className="space-y-2">
+                  {Object.entries(hero.stats).map(([stat, value]) => (
+                    <div key={stat} className="flex items-center space-x-2">
+                      <span className="text-white/70 uppercase text-sm">{stat}</span>
+                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-red-500 transition-all duration-1000"
+                          style={{ width: `${value}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-black/50 backdrop-blur-md rounded-xl p-4">
+                <h3 className="text-blue-500 text-xl mb-2">{nextHero.name}</h3>
+                <div className="space-y-2">
+                  {Object.entries(nextHero.stats).map(([stat, value]) => (
+                    <div key={stat} className="flex items-center space-x-2">
+                      <span className="text-white/70 uppercase text-sm">{stat}</span>
+                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-500 transition-all duration-1000"
+                          style={{ width: `${value}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={() => setShowFightSequence(false)}
+            className="absolute top-8 right-8 z-50 px-6 py-3 bg-white/10 backdrop-blur-lg rounded-full text-white hover:bg-white/20 transition-all"
+          >
+            Exit Battle
+          </button>
         </div>
       </div>
     </div>

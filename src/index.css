@@ -2,39 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes heroEntrance {
+@keyframes scan {
   0% {
     opacity: 0;
-    transform: scale(0.8) translateY(100px);
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
   }
   100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+    opacity: 0;
+    transform: translate(20px, 20px);
   }
+}
+
+@keyframes beam-horizontal {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes beam-vertical {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-100px) scale(2);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes hero-float-reverse {
+  0%, 100% {
+    transform: translateY(-20px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
+
+.animate-scan {
+  animation: scan 2s infinite;
+}
+
+.animate-beam-horizontal {
+  animation: beam-horizontal 3s infinite;
+}
+
+.animate-beam-vertical {
+  animation: beam-vertical 3s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s infinite;
+}
+
+.animate-hero-float {
+  animation: hero-float 4s infinite ease-in-out;
+}
+
+.animate-hero-float-reverse {
+  animation: hero-float-reverse 4s infinite ease-in-out;
 }
 
 .content-section {
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content-section.animate-in {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-}
-
-.perspective-3d {
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-body {
-  margin: 0;
-  overflow-x: hidden;
-  background: black;
-  color: white;
-}
-
-/* Custom gradient background */
-.bg-gradient-radial {
-  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  opacity: 1;
+  transform: translateY(0);
 }
